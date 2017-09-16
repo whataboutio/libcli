@@ -33,19 +33,7 @@
 #define MATCH_REGEX     1
 #define MATCH_INVERT    2
 
-#ifdef WIN32
-/*
- * Stupid windows has multiple namespaces for filedescriptors, with different
- * read/write functions required for each ..
- */
-int read(int fd, void *buf, unsigned int count) {
-    return recv(fd, buf, count, 0);
-}
-
-int write(int fd, const void *buf, unsigned int count) {
-    return send(fd, buf, count, 0);
-}
-
+#if defined(WIN32) || defined(__QNX__)
 int vasprintf(char **strp, const char *fmt, va_list args) {
     int size;
 
@@ -67,6 +55,20 @@ int asprintf(char **strp, const char *fmt, ...) {
 
     va_end(args);
     return size;
+}
+#endif
+
+#ifdef WIN32
+/*
+ * Stupid windows has multiple namespaces for filedescriptors, with different
+ * read/write functions required for each ..
+ */
+int read(int fd, void *buf, unsigned int count) {
+    return recv(fd, buf, count, 0);
+}
+
+int write(int fd, const void *buf, unsigned int count) {
+    return send(fd, buf, count, 0);
 }
 
 int fprintf(FILE *stream, const char *fmt, ...) {
